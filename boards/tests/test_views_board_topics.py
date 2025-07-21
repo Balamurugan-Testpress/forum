@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import resolve, reverse
 
-from boards.views import board_topics
+from boards.views import TopicListView, board_topics
 from boards.models import Board
 
 
@@ -37,3 +37,7 @@ class BoardTopicsTests(TestCase):
         response = self.client.get(board_topics_url)
         self.assertContains(response, f'href="{home_url}"')
         self.assertContains(response, f'href="{new_topic_url}"')
+
+    def test_board_topics_url_resolves_board_topics_view(self):
+        view = resolve("/board/1/")
+        self.assertEqual(view.func.view_class, TopicListView)

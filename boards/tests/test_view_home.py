@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
-from django.urls import reverse
+from django.urls import resolve, reverse
 
 from boards.models import Board
+from boards.views import BoardListView
 
 
 class HomeViewTests(TestCase):
