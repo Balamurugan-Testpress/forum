@@ -32,8 +32,8 @@ class Topic(models.Model):
 
     def get_page_count(self):
         count = self.posts.count()
-        pages = count / 20
-        return math.ceil(pages)
+        pages = math.ceil(count / 2)
+        return pages
 
     def has_many_pages(self, count=None):
         if count is None:
@@ -47,7 +47,7 @@ class Topic(models.Model):
         return range(1, count + 1)
 
     def get_replies_count(self):
-        return self.posts.count() + 1  # excluding the first post
+        return self.posts.count() + 1
 
     def get_last_ten_posts(self):
         return self.posts.order_by("-created_at")[:10]
@@ -68,7 +68,5 @@ class Post(models.Model):
         return truncated_message.chars(30)
 
     def get_message_as_markdown(self):
-        html = markdown.markdown(
-            self.message, extensions=["fenced_code", "codehilite"]
-        )  # optional: add other extensions
+        html = markdown.markdown(self.message, extensions=["fenced_code", "codehilite"])
         return mark_safe(html)

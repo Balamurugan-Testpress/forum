@@ -63,7 +63,7 @@ class ReplyTopicTests(ReplyTopicTestCase):
         """
         The view must contain two inputs: csrf, message textarea
         """
-        self.assertContains(self.response, "<input", 2)
+        self.assertContains(self.response, "<input", 1)
         self.assertContains(self.response, "<textarea", 1)
 
 
@@ -77,10 +77,19 @@ class SuccessfulReplyTopicTests(ReplyTopicTestCase):
         """
         A valid form submission should redirect the user
         """
+        expected_url = (
+            reverse(
+                "topic_posts", kwargs={"pk": self.board.pk, "topic_pk": self.topic.pk}
+            )
+            + "?page=1#2"
+        )
+
+        self.assertRedirects(self.response, expected_url)
+
         topic_posts_url = reverse(
             "topic_posts", kwargs={"pk": self.board.pk, "topic_pk": self.topic.pk}
         )
-        self.assertRedirects(self.response, topic_posts_url)
+        self.assertRedirects(self.response, expected_url)
 
     def test_reply_created(self):
         """

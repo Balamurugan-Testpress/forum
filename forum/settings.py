@@ -12,11 +12,17 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
+from decouple import config, Csv
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = "django-insecure-4h^5_$i0y#i6ot)812wkx_r!*gb#f&lsdnwv$j=&b_494+y9po"
-DEBUG = True
-ALLOWED_HOSTS = []
+
+
+SECRET_KEY = config("SECRET_KEY")
+DEBUG = config("DEBUG", default=False, cast=bool)
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
+DATABASES = {"default": dj_database_url.config(default=config("DATABASE_URL"))}
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -24,10 +30,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "widget_tweaks",
     "boards.apps.BoardsConfig",
     "accounts.apps.AccountsConfig",
     "django.contrib.humanize",
+    "widget_tweaks",
 ]
 
 MIDDLEWARE = [
@@ -58,12 +64,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "forum.wsgi.application"
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
