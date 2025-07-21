@@ -1,6 +1,6 @@
-from django.urls import path, re_path
+from django.urls import path
 from django.contrib.auth import views as auth_views
-from accounts.views import signup
+from accounts.views import UserUpdateView, signup
 
 urlpatterns = [
     path("signup/", signup, name="signup"),
@@ -49,5 +49,10 @@ urlpatterns = [
             template_name="password_change_done.html"
         ),
         name="password_change_done",
+    ),
+    path(
+        "settings/",
+        UserUpdateView.as_view(),
+        name="my_account",
     ),
 ]

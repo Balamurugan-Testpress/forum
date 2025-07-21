@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.html import mark_safe
 from django.utils.text import Truncator
+import markdown
+import math
 
 
 class Board(models.Model):
@@ -22,13 +25,32 @@ class Topic(models.Model):
     last_updated = models.DateTimeField(auto_now_add=True)
     board = models.ForeignKey(Board, related_name="topics", on_delete=models.CASCADE)
     starter = models.ForeignKey(User, related_name="topics", on_delete=models.CASCADE)
-    views = models.PositiveIntegerField(default=0)  # <- here
+    views = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return str(self.subject)
 
+    def get_page_count(self):
+        count = self.posts.count()
+        pages = count / 20
+        return math.ceil(pages)
+
+    def has_many_pages(self, count=None):
+        if count is None:
+            count = self.get_page_count()
+        return count > 6
+
+    def get_page_range(self):
+        count = self.get_page_count()
+        if self.has_many_pages(count):
+            return range(1, 5)
+        return range(1, count + 1)
+
     def get_replies_count(self):
-        return self.posts.count()  # excluding the first post
+        return self.posts.count() + 1  # excluding the first post
+
+    def get_last_ten_posts(self):
+        return self.posts.order_by("-created_at")[:10]
 
 
 class Post(models.Model):
@@ -44,3 +66,9 @@ class Post(models.Model):
     def __str__(self):
         truncated_message = Truncator(self.message)
         return truncated_message.chars(30)
+
+    def get_message_as_markdown(self):
+        html = markdown.markdown(
+            self.message, extensions=["fenced_code", "codehilite"]
+        )  # optional: add other extensions
+        return mark_safe(html)

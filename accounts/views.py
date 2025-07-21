@@ -3,6 +3,11 @@ from django.shortcuts import render, redirect
 
 from .forms import SignUpForm
 
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
+from django.urls import reverse_lazy
+from django.views.generic import UpdateView
+
 
 def signup(request):
     if request.method == "POST":
@@ -14,3 +19,17 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, "signup.html", {"form": form})
+
+
+class UserUpdateView(LoginRequiredMixin, UpdateView):
+    model = User
+    fields = (
+        "first_name",
+        "last_name",
+        "email",
+    )
+    template_name = "my_account.html"
+    success_url = reverse_lazy("home")
+
+    def get_object(self):
+        return self.request.user
